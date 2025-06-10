@@ -232,7 +232,7 @@ def send_care_package_notification(user_id, package_name, notification_type):
             title,
             message,
             "care_package",
-            metadata={
+            extra_data={
                 "package_name": package_name,
                 "notification_type": notification_type
             }
@@ -264,7 +264,7 @@ def send_emergency_notification(user_id, emergency_type, location=None):
             title,
             message,
             "emergency",
-            metadata={
+            extra_data={
                 "emergency_type": emergency_type,
                 "location": location
             }

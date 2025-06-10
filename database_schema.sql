@@ -204,7 +204,7 @@ CREATE TABLE notifications (
     notification_type VARCHAR(50) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     scheduled_for TIMESTAMP,
-    metadata JSONB,
+    extra_data JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -242,7 +242,7 @@ CREATE TABLE chat_messages (
     message TEXT NOT NULL,
     message_type VARCHAR(20) DEFAULT 'text' CHECK (message_type IN ('text', 'image', 'file')),
     is_anonymous BOOLEAN DEFAULT FALSE,
-    metadata JSONB,
+    extra_data JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

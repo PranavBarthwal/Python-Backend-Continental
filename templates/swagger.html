@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHR Healthcare API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='swagger-ui.css') }}" />
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: var(--bs-dark);
+            color: var(--bs-light);
+        }
+        
+        .swagger-ui-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: var(--bs-primary);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .header p {
+            text-align: center;
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .api-info {
+            background: var(--bs-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .api-info h3 {
+            color: var(--bs-light);
+            margin-top: 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-secondary);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .feature-card h4 {
+            color: var(--bs-info);
+            margin-top: 0;
+        }
+        
+        .feature-card ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .feature-card li {
+            margin-bottom: 5px;
+        }
+        
+        .swagger-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--bs-light);
+        }
+        
+        .spinner {
+            border: 4px solid var(--bs-secondary);
+            border-top: 4px solid var(--bs-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .auth-info {
+            background: var(--bs-warning);
+            color: var(--bs-dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .auth-info strong {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .quick-links a {
+            background: var(--bs-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .quick-links a:hover {
+            background: var(--bs-primary-dark);
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="swagger-ui-container">
+        <div class="header">
+            <h1>PHR Healthcare API</h1>
+            <p>Comprehensive Personal Health Records API with HMIS Integration and AI Features</p>
+        </div>
+        
+        <div class="api-info">
+            <h3>🏥 About PHR Healthcare API</h3>
+            <p>
+                The PHR Healthcare API is a comprehensive solution for Personal Health Records management,
+                designed for seamless integration with Hospital Management Information Systems (HMIS).
+                It provides AI-powered features for symptom analysis, medical record summarization,
+                and intelligent healthcare insights.
+            </p>
+        </div>
+        
+        <div class="auth-info">
+            <strong>🔐 Authentication Required</strong>
+            Most endpoints require JWT authentication. Use the login endpoints to obtain an access token,
+            then include it in the Authorization header as "Bearer {token}".
+        </div>
+        
+        <div class="quick-links">
+            <a href="#/Authentication">Authentication</a>
+            <a href="#/Profile">User Profile</a>
+            <a href="#/Doctors">Doctors</a>
+            <a href="#/Appointments">Appointments</a>
+            <a href="#/Symptom%20Checker">Symptom Checker</a>
+            <a href="#/Document%20Management">Documents</a>
+            <a href="#/Medicine%20Management">Medicines</a>
+            <a href="#/Lab%20Tests">Lab Tests</a>
+            <a href="#/AI%20Services">AI Services</a>
+            <a href="#/Mental%20Health">Mental Health</a>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🔐 Authentication & Security</h4>
+                <ul>
+                    <li>Multi-factor authentication (Mobile OTP, Email, ABHA)</li>
+                    <li>JWT-based session management</li>
+                    <li>Secure profile sharing with hospitals</li>
+                    <li>QR code profile generation</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4>👩‍⚕️ Doctor & Appointment Management</h4>
+                <ul>
+                    <li>Doctor search by specialty and name</li>
+                    <li>Real-time availability checking</li>
+                    <li>Online appointment booking</li>
+                    <li>HMIS integration for hospital doctors</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4>🤖 AI-Powered Health Features</h4>
+                <ul>
+                    <li>Symptom analysis with voice recording</li>
+                    <li>Medical record summarization</li>
+                    <li>Audio transcription using Google Gemini</li>
+                    <li>Intelligent health insights</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4>📋 Document & Record Management</h4>
+                <ul>
+                    <li>Secure document upload and storage</li>
+                    <li>Prescription image processing</li>
+                    <li>Medical handouts and test results</li>
+                    <li>HMIS document integration</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4>💊 Medicine & Health Tracking</h4>
+                <ul>
+                    <li>Medicine reminder system</li>
+                    <li>Prescription management</li>
+                    <li>Lab test booking and results</li>
+                    <li>Smart notification system</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4>🚑 Emergency & Support Services</h4>
+                <ul>
+                    <li>Ambulance booking and tracking</li>
+                    <li>Care package management</li>
+                    <li>Peer support chat (anonymous)</li>
+                    <li>Emergency contact integration</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="swagger-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                Loading API Documentation...
+            </div>
+            <div id="swagger-ui"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Hide loading spinner
+            document.getElementById('loading').style.display = 'none';
+            
+            // Initialize Swagger UI
+            const ui = SwaggerUIBundle({
+                url: '/api/swagger.json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                defaultModelsExpandDepth: 2,
+                defaultModelExpandDepth: 2,
+                docExpansion: 'list',
+                filter: true,
+                showExtensions: true,
+                showCommonExtensions: true,
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                validatorUrl: null,
+                requestInterceptor: function(request) {
+                    // Add any request modifications here if needed
+                    return request;
+                },
+                responseInterceptor: function(response) {
+                    // Add any response modifications here if needed
+                    return response;
+                },
+                onComplete: function() {
+                    console.log('Swagger UI loaded successfully');
+                },
+                onFailure: function(error) {
+                    console.error('Failed to load Swagger UI:', error);
+                    document.getElementById('swagger-ui').innerHTML = 
+                        '<div style="padding: 20px; text-align: center; color: red;">' +
+                        '<h3>Failed to load API documentation</h3>' +
+                        '<p>Please check the console for more details.</p>' +
+                        '</div>';
+                }
+            });
+            
+            // Custom styling for better integration
+            setTimeout(function() {
+                const style = document.createElement('style');
+                style.textContent = `
+                    .swagger-ui .topbar { display: none; }
+                    .swagger-ui .info { margin: 20px 0; }
+                    .swagger-ui .scheme-container { 
+                        background: #f8f9fa; 
+                        border: 1px solid #dee2e6;
+                        margin: 20px 0;
+                        padding: 15px;
+                        border-radius: 5px;
+                    }
+                `;
+                document.head.appendChild(style);
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

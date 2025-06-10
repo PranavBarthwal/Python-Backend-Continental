@@ -5,7 +5,7 @@ from models import Notification, User, MedicineTracker
 
 logger = logging.getLogger(__name__)
 
-def create_notification(user_id, title, message, notification_type, scheduled_for=None, metadata=None):
+def create_notification(user_id, title, message, notification_type, scheduled_for=None, extra_data=None):
     """
     Create a new notification for a user
     """
@@ -16,7 +16,7 @@ def create_notification(user_id, title, message, notification_type, scheduled_fo
             message=message,
             notification_type=notification_type,
             scheduled_for=scheduled_for or datetime.utcnow(),
-            metadata=metadata or {}
+            extra_data=extra_data or {}
         )
         
         db.session.add(notification)
@@ -54,7 +54,7 @@ def get_user_notifications(user_id, limit=50, include_read=True):
                 "is_read": notification.is_read,
                 "scheduled_for": notification.scheduled_for.isoformat() if notification.scheduled_for else None,
                 "created_at": notification.created_at.isoformat(),
-                "metadata": notification.metadata
+                "extra_data": notification.extra_data
             })
         
         return notifications_list
@@ -115,7 +115,7 @@ def send_medicine_reminders():
                         Notification.user_id == tracker.user_id,
                         Notification.notification_type == 'medicine_reminder',
                         Notification.created_at >= datetime.combine(current_date, time.min),
-                        Notification.metadata['medicine_tracker_id'].astext == tracker.id
+                        Notification.extra_data['medicine_tracker_id'].astext == tracker.id
                     ).count()
                     
                     if today_notifications == 0:
@@ -124,7 +124,7 @@ def send_medicine_reminders():
                             "Medicine Reminder",
                             f"Time to take {tracker.medicine_name} - {tracker.dosage}",
                             "medicine_reminder",
-                            metadata={
+                            extra_data={
                                 "medicine_tracker_id": tracker.id,
                                 "timing": timing
                             }
@@ -155,7 +155,7 @@ def send_appointment_reminders():
             existing_reminder = Notification.query.filter(
                 Notification.user_id == appointment.user_id,
                 Notification.notification_type == 'appointment_reminder',
-                Notification.metadata['appointment_id'].astext == appointment.id
+                Notification.extra_data['appointment_id'].astext == appointment.id
             ).first()
             
             if not existing_reminder:
@@ -168,7 +168,7 @@ def send_appointment_reminders():
                     "Appointment Reminder",
                     f"You have an appointment with Dr. {doctor_name} tomorrow at {appointment.appointment_time.strftime('%H:%M')}",
                     "appointment_reminder",
-                    metadata={
+                    extra_data={
                         "appointment_id": appointment.id,
                         "doctor_name": doctor_name,
                         "appointment_time": appointment.appointment_time.strftime('%H:%M')
@@ -197,7 +197,7 @@ def send_lab_result_notification(user_id, lab_booking_id, results_available=True
             title,
             message,
             "lab_results",
-            metadata={
+            extra_data={
                 "lab_booking_id": lab_booking_id,
                 "results_available": results_available
             }

@@ -191,7 +191,7 @@ class Notification(db.Model):
     notification_type = db.Column(db.String(50), nullable=False)  # medicine_reminder, appointment, etc.
     is_read = db.Column(db.Boolean, default=False)
     scheduled_for = db.Column(db.DateTime, nullable=True)
-    metadata = db.Column(db.JSON, nullable=True)
+    extra_data = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class CarePackage(db.Model):
@@ -229,7 +229,7 @@ class ChatMessage(db.Model):
     message = db.Column(db.Text, nullable=False)
     message_type = db.Column(db.String(20), default='text')  # text, image, file
     is_anonymous = db.Column(db.Boolean, default=False)
-    metadata = db.Column(db.JSON, nullable=True)
+    extra_data = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class AmbulanceService(db.Model):

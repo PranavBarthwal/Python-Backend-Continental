@@ -56,7 +56,8 @@ def swagger_json():
                 "bearerAuth": {
                     "type": "http",
                     "scheme": "bearer",
-                    "bearerFormat": "JWT"
+                    "bearerFormat": "JWT",
+                    "description": "Enter JWT token obtained from authentication endpoints"
                 }
             },
             "schemas": {
@@ -129,9 +130,7 @@ def swagger_json():
                 }
             }
         },
-        "security": [
-            {"bearerAuth": []}
-        ],
+        "security": [],
         "paths": {
             "/auth/request-otp": {
                 "post": {
@@ -293,6 +292,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Profile"],
                     "summary": "Get user profile",
+                    "security": [{"bearerAuth": []}],
                     "responses": {
                         "200": {
                             "description": "User profile retrieved",
@@ -313,6 +313,7 @@ def swagger_json():
                 "put": {
                     "tags": ["Profile"],
                     "summary": "Update user profile",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {

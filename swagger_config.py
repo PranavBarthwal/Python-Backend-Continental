@@ -338,6 +338,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Profile"],
                     "summary": "Generate QR code for user profile",
+                    "security": [{"bearerAuth": []}],
                     "responses": {
                         "200": {
                             "description": "QR code generated",
@@ -361,6 +362,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Profile"],
                     "summary": "Share profile with hospital HMIS",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -391,6 +393,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Doctors"],
                     "summary": "Get list of doctors",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "specialty",

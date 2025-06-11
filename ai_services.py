@@ -2,52 +2,162 @@ import os
 import logging
 from datetime import datetime
 import json
+import time
+import functools
 
 # Import Google Gemini client
 try:
     import google.generativeai as genai
+    from google.generativeai.types import HarmCategory, HarmBlockThreshold
 except ImportError:
     genai = None
+    HarmCategory = None
+    HarmBlockThreshold = None
     logging.warning("Google Generative AI library not installed. AI features will be limited.")
 
 logger = logging.getLogger(__name__)
 
 # Configure Gemini API
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "gemini_api_key")
-if genai and GEMINI_API_KEY != "gemini_api_key":
-    genai.configure(api_key=GEMINI_API_KEY)
+GEMINI_REQUEST_TIMEOUT = int(os.environ.get("GEMINI_REQUEST_TIMEOUT", "60"))
 
-def transcribe_audio(audio_file_path):
-    """
-    Transcribe audio file using Google Gemini API
-    """
+if genai and GEMINI_API_KEY != "gemini_api_key":
     try:
-        if not genai:
+        genai.configure(api_key=GEMINI_API_KEY)
+        logger.info("Google Gemini AI configured successfully")
+    except Exception as e:
+        logger.error(f"Failed to configure Google Gemini AI: {str(e)}")
+        genai = None
+
+def retry_on_failure(max_retries=3, delay=1):
+    """Decorator for retrying AI operations with exponential backoff"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    if attempt < max_retries - 1:
+                        wait_time = delay * (2 ** attempt)
+                        logger.warning(f"AI operation failed (attempt {attempt + 1}/{max_retries}): {str(e)}. Retrying in {wait_time}s...")
+                        time.sleep(wait_time)
+                    else:
+                        logger.error(f"AI operation failed after {max_retries} attempts: {str(e)}")
+            
+            # Return fallback response on final failure
             return {
                 "success": False,
-                "message": "Google Generative AI not available"
+                "message": f"AI service unavailable after {max_retries} attempts: {str(last_exception)}",
+                "fallback": True
+            }
+        return wrapper
+    return decorator
+
+def log_ai_operation(operation_name):
+    """Decorator for logging AI operations"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            logger.info(f"Starting AI operation: {operation_name}")
+            try:
+                result = func(*args, **kwargs)
+                duration = time.time() - start_time
+                logger.info(f"AI operation {operation_name} completed successfully in {duration:.2f}s")
+                return result
+            except Exception as e:
+                duration = time.time() - start_time
+                logger.error(f"AI operation {operation_name} failed after {duration:.2f}s: {str(e)}")
+                raise
+        return wrapper
+    return decorator
+
+def get_gemini_model(model_name='gemini-1.5-flash'):
+    """Get configured Gemini model with safety settings"""
+    if not genai:
+        raise Exception("Google Generative AI not available")
+    
+    safety_settings = {
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    } if HarmCategory and HarmBlockThreshold else None
+    
+    return genai.GenerativeModel(
+        model_name=model_name,
+        safety_settings=safety_settings
+    )
+
+@retry_on_failure(max_retries=3)
+@log_ai_operation("audio_transcription")
+def transcribe_audio(audio_file_path):
+    """
+    Transcribe audio file using Google Gemini API with robust error handling
+    """
+    if not genai:
+        logger.error("Google Generative AI not available for audio transcription")
+        return {
+            "success": False,
+            "message": "AI transcription service not available",
+            "fallback": True
+        }
+    
+    if not os.path.exists(audio_file_path):
+        logger.error(f"Audio file not found: {audio_file_path}")
+        return {
+            "success": False,
+            "message": "Audio file not found"
+        }
+    
+    try:
+        # Check file size and format
+        file_size = os.path.getsize(audio_file_path)
+        max_size = int(os.environ.get("AUDIO_RECORDING_MAX_SIZE", "50000000"))  # 50MB default
+        
+        if file_size > max_size:
+            logger.error(f"Audio file too large: {file_size} bytes (max: {max_size})")
+            return {
+                "success": False,
+                "message": "Audio file too large for processing"
             }
         
         # Upload audio file to Gemini
+        logger.info(f"Uploading audio file: {audio_file_path} ({file_size} bytes)")
         audio_file = genai.upload_file(audio_file_path)
         
         # Use Gemini to transcribe the audio
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = get_gemini_model()
         prompt = """
-        Please transcribe this audio recording. The audio contains a patient describing their symptoms.
-        Provide only the transcription of what was said, without any additional commentary.
+        Please transcribe this audio recording accurately. The audio contains a patient describing their symptoms.
+        Provide only the transcription of what was said, without any additional commentary or interpretation.
+        If the audio is unclear or inaudible, indicate that clearly.
         """
         
         response = model.generate_content([prompt, audio_file])
+        
+        if not response or not response.text:
+            logger.error("Empty response from Gemini API during transcription")
+            return {
+                "success": False,
+                "message": "No transcription generated"
+            }
+        
         transcription = response.text.strip()
+        logger.info(f"Audio transcription completed: {len(transcription)} characters")
         
         return {
             "success": True,
-            "transcription": transcription
+            "transcription": transcription,
+            "file_size": file_size,
+            "processing_time": time.time()
         }
         
     except Exception as e:
-        logger.error(f"Error transcribing audio: {str(e)}")
+        logger.error(f"Error transcribing audio {audio_file_path}: {str(e)}", exc_info=True)
         return {
             "success": False,
             "message": f"Transcription failed: {str(e)}"

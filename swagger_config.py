@@ -433,6 +433,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Doctors"],
                     "summary": "Get doctor availability",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "doctor_id",
@@ -473,6 +474,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Appointments"],
                     "summary": "Book an appointment",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -512,6 +514,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Appointments"],
                     "summary": "Get user appointments",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "status",
@@ -544,6 +547,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Symptom Checker"],
                     "summary": "Get list of symptoms",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "category",
@@ -573,6 +577,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Symptom Checker"],
                     "summary": "Create symptom assessment",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {

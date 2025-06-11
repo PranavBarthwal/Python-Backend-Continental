@@ -616,6 +616,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Symptom Checker"],
                     "summary": "Upload audio for symptom assessment",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -652,6 +653,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Document Management"],
                     "summary": "Upload a document",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -681,6 +683,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Document Management"],
                     "summary": "Get user documents",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "type",
@@ -713,6 +716,7 @@ def swagger_json():
                 "post": {
                     "tags": ["AI Services"],
                     "summary": "Summarize medical records using AI",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -750,6 +754,7 @@ def swagger_json():
                 "post": {
                     "tags": ["Medicine Management"],
                     "summary": "Add medicine to tracker",
+                    "security": [{"bearerAuth": []}],
                     "requestBody": {
                         "required": True,
                         "content": {
@@ -783,6 +788,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Medicine Management"],
                     "summary": "Get medicine tracker list",
+                    "security": [{"bearerAuth": []}],
                     "responses": {
                         "200": {
                             "description": "Medicine tracker list",
@@ -805,6 +811,7 @@ def swagger_json():
                 "get": {
                     "tags": ["Lab Tests"],
                     "summary": "Get available lab tests",
+                    "security": [{"bearerAuth": []}],
                     "parameters": [
                         {
                             "name": "category",
